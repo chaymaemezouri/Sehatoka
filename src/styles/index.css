@@ -1,0 +1,161 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --canvas: #f3efe6;
+  --canvas-elevated: #faf7f1;
+  --canvas-warm: #ebe4d6;
+  --ink: #0c1526;
+  --ink-soft: #3d4758;
+  --ink-faint: #6b7384;
+  --navy: #0c1526;
+  --navy-mid: #162236;
+  --navy-deep: #08101c;
+  --emerald: #0d7a5c;
+  --emerald-bright: #14936e;
+  --emerald-soft: #d7eee4;
+  --teal: #1a6b6a;
+  --gold: #9c7c45;
+  --danger: #9b3b32;
+  --danger-soft: #f3ddd9;
+  --line: rgb(12 21 38 / 0.1);
+  --line-strong: rgb(12 21 38 / 0.16);
+  --glass: rgb(250 247 241 / 0.72);
+  --shadow-soft: 0 24px 60px rgb(12 21 38 / 0.1);
+  --radius: 1.15rem;
+  --background: var(--canvas);
+  --foreground: var(--ink);
+  --card: var(--canvas-elevated);
+  --card-foreground: var(--ink);
+  --primary: var(--navy);
+  --primary-foreground: var(--canvas-elevated);
+  --secondary: var(--canvas-warm);
+  --secondary-foreground: var(--ink);
+  --muted: var(--canvas-warm);
+  --muted-foreground: var(--ink-soft);
+  --accent: var(--emerald);
+  --accent-foreground: #ffffff;
+  --destructive: var(--danger);
+  --border: var(--line);
+  --input: var(--line);
+  --ring: var(--emerald);
+}
+
+@theme inline {
+  --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Cormorant Garamond", ui-serif, Georgia, "Times New Roman", serif;
+  --color-canvas: var(--canvas);
+  --color-canvas-elevated: var(--canvas-elevated);
+  --color-canvas-warm: var(--canvas-warm);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-faint: var(--ink-faint);
+  --color-navy: var(--navy);
+  --color-navy-mid: var(--navy-mid);
+  --color-navy-deep: var(--navy-deep);
+  --color-emerald: var(--emerald);
+  --color-emerald-bright: var(--emerald-bright);
+  --color-emerald-soft: var(--emerald-soft);
+  --color-teal: var(--teal);
+  --color-gold: var(--gold);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-line: var(--line);
+  --color-glass: var(--glass);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: 0.55rem;
+  --radius-md: 0.85rem;
+  --radius-lg: var(--radius);
+  --radius-xl: 1.6rem;
+  --shadow-lift: var(--shadow-soft);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-[#efeeec] font-sans text-ink antialiased;
+    min-height: 100vh;
+    overflow-x: clip;
+  }
+
+  #root {
+    position: relative;
+    z-index: 1;
+  }
+
+  ::selection {
+    background: rgb(13 122 92 / 0.2);
+    color: var(--ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--emerald);
+    outline-offset: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@utility container-page {
+  margin-inline: auto;
+  width: min(100% - 2rem, 1180px);
+
+  @media (min-width: 768px) {
+    width: min(100% - 3.5rem, 1180px);
+  }
+}
+
+@utility hairline {
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.chat-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(12 21 38 / 0.22) transparent;
+}
+
+.chat-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.chat-scroll::-webkit-scrollbar-thumb {
+  background: rgb(12 21 38 / 0.18);
+  border-radius: 999px;
+}
