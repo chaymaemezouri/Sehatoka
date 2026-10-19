@@ -21,7 +21,7 @@ export function ChatPanel({ expandHref, chat: externalChat, promptLimit }: ChatP
   const { messages, isTyping, error, send, reset, restoreExample, isExample } =
     externalChat ?? localChat
   const prompts = t.prompts.slice(0, promptLimit ?? t.prompts.length)
-  const shown = isExample ? t.example : messages
+  const shown = isExample ? t.example : messages.filter((message) => !message.isExample)
   const askAppointment = () => {
     void send(t.chat.bookMessage)
   }

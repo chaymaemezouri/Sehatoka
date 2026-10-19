@@ -31,13 +31,14 @@ export function useChat() {
         createdAt: nowIso(),
       }
 
+      const history = [...messages, userMessage]
       setError(null)
       setMessages((current) => [...current, userMessage])
       setIsTyping(true)
 
       try {
         const output = await adapter.complete({
-          history: [...messages, userMessage],
+          history,
           userMessage: content,
         })
 
@@ -49,7 +50,10 @@ export function useChat() {
           recommendation: output.recommendation,
         }
 
-        setMessages((current) => [...current, assistantMessage])
+        setMessages((current) => [
+          ...current.filter((message) => !message.isExample),
+          assistantMessage,
+        ])
         if (output.appointment) {
           setAppointments((current) => [...current, output.appointment as AppointmentRequest])
         }
@@ -85,6 +89,6 @@ export function useChat() {
     send,
     reset,
     restoreExample,
-    isExample: messages.some((message) => message.isExample),
+    isExample: messages.length > 0 && messages.every((message) => message.isExample),
   }
 }
