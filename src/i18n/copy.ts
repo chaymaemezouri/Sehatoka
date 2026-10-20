@@ -1,4 +1,3 @@
-import { OPTHOCARE_URL } from "@/data/site.ts"
 import type { ChatMessage } from "@/types/chat.ts"
 import type { SpecialtyId } from "@/types/specialty.ts"
 
@@ -34,7 +33,7 @@ function exampleThread(
         status: "available",
         rationale,
         ctaLabel,
-        ctaHref: OPTHOCARE_URL,
+        ctaHref: "#patient/medecins?specialite=ophthalmology",
         urgency: "orientation",
       },
     },
@@ -45,6 +44,15 @@ const fr = {
   skip: "Aller à Sehatoka AI",
   openAi: "Ouvrir Sehatoka AI",
   discoverAi: "Découvrir Sehatoka AI",
+  signIn: "Connexion",
+  patientSpace: "Espace patient",
+  logout: "Déconnexion",
+  register: "Inscription",
+  authEmail: "E-mail",
+  authPassword: "Mot de passe",
+  authName: "Nom",
+  authContinue: "Continuer",
+  authClose: "Fermer",
   nav: [
     { href: "#accueil", label: "Accueil" },
     { href: "#specialites", label: "Spécialités" },
@@ -182,10 +190,10 @@ const fr = {
   ],
   example: exampleThread(
     "J'ai une vision floue et une gêne aux yeux.",
-    "Une consultation en ophtalmologie peut être appropriée. OphthoCare peut prendre le relais.",
+    "Une consultation en ophtalmologie peut être appropriée. Ce n'est pas un diagnostic.",
     "Ophtalmologie",
-    "Module existant — orientation vers OphthoCare pour le parcours oculaire.",
-    "Accéder à OphthoCare",
+    "Orientation vers l'ophtalmologie, avec les médecins proposés pour cette spécialité.",
+    "Trouver un médecin",
   ),
 }
 
@@ -193,6 +201,15 @@ const en: Copy = {
   skip: "Skip to Sehatoka AI",
   openAi: "Open Sehatoka AI",
   discoverAi: "Discover Sehatoka AI",
+  signIn: "Sign in",
+  patientSpace: "Patient space",
+  logout: "Log out",
+  register: "Register",
+  authEmail: "Email",
+  authPassword: "Password",
+  authName: "Name",
+  authContinue: "Continue",
+  authClose: "Close",
   nav: [
     { href: "#accueil", label: "Home" },
     { href: "#specialites", label: "Specialties" },
@@ -329,10 +346,10 @@ const en: Copy = {
   ],
   example: exampleThread(
     "I have blurred vision and discomfort in my eyes.",
-    "An ophthalmology visit may be appropriate. OphthoCare can take the next step.",
+    "An ophthalmology visit may be appropriate. This is not a diagnosis.",
     "Ophthalmology",
-    "Existing module — guidance toward OphthoCare for the eye pathway.",
-    "Open OphthoCare",
+    "Guidance toward ophthalmology, with the doctors suggested for this specialty.",
+    "Find a doctor",
   ),
 }
 

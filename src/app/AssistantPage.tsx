@@ -1,8 +1,8 @@
 import { ArrowLeft, CalendarClock, ClipboardList, RotateCcw, Siren } from "lucide-react"
 import type { ReactNode } from "react"
 import { ChatPanel } from "@/components/chatbot/ChatPanel.tsx"
+import { directoryDoctors } from "@/data/demo-directory.ts"
 import { useChat } from "@/hooks/useChat.ts"
-import { OPTHOCARE_URL } from "@/data/site.ts"
 import { cn } from "@/lib/utils.ts"
 
 const atmosphere = [
@@ -12,17 +12,15 @@ const atmosphere = [
   "linear-gradient(165deg, #f6eef3 0%, #f7ece6 46%, #e7ebf8 100%)",
 ].join(",")
 
-const windows = [
-  { label: "Matin", text: "Je souhaite un rendez-vous, de préférence le matin." },
-  { label: "Après-midi", text: "Je souhaite un rendez-vous, de préférence l'après-midi." },
-  { label: "Cette semaine", text: "Je souhaite un rendez-vous, de préférence cette semaine." },
-]
-
 export function AssistantPage() {
   const chat = useChat()
   const recommendation = [...chat.messages]
     .reverse()
     .find((message) => message.recommendation)?.recommendation
+  const doctors =
+    recommendation?.specialtyId && recommendation.urgency !== "urgent"
+      ? directoryDoctors.filter((doctor) => doctor.specialtyId === recommendation.specialtyId)
+      : []
 
   return (
     <div className="relative flex h-svh flex-col overflow-hidden">
@@ -70,7 +68,7 @@ export function AssistantPage() {
           <ChatPanel chat={chat} />
         </section>
 
-        <aside className="flex max-h-36 min-h-0 flex-col gap-2 overflow-y-auto rounded-[1.25rem] border border-white/55 bg-white/28 p-3 shadow-[inset_0_1px_0_rgb(255_255_255_/_0.8)] backdrop-blur-2xl sm:max-h-44 sm:gap-3 sm:rounded-[1.6rem] sm:p-4 lg:max-h-none lg:p-5">
+        <aside className="flex max-h-80 min-h-0 flex-col gap-2 overflow-y-auto rounded-[1.25rem] border border-white/55 bg-white/28 p-3 shadow-[inset_0_1px_0_rgb(255_255_255_/_0.8)] backdrop-blur-2xl sm:max-h-96 sm:gap-3 sm:rounded-[1.6rem] sm:p-4 lg:max-h-none lg:p-5">
           <p className="text-[13px] text-ink-faint">Parcours</p>
           <h2 className="text-[1.15rem] font-medium tracking-[-0.04em] text-ink sm:text-[1.45rem]">
             {recommendation?.specialtyName ?? "En attente d'un besoin"}
@@ -78,52 +76,39 @@ export function AssistantPage() {
           <p className="text-[14px] leading-relaxed text-ink-soft">
             {recommendation
               ? recommendation.rationale
-              : "Décrivez un besoin. L'orientation apparaît ici, puis vous pouvez formuler une demande de rendez-vous."}
+              : "Décrivez ce qui vous amène. Les médecins de la spécialité correspondante apparaissent ici."}
           </p>
 
-          <div className="mt-2">
-            <p className="text-[12px] text-ink-faint">Préférence de rendez-vous</p>
-            <div className="mt-2 flex flex-row flex-wrap gap-2 lg:flex-col">
-              {windows.map((item) => (
-                <button
-                  key={item.label}
-                  type="button"
-                  disabled={chat.isTyping}
-                  onClick={() => void chat.send(item.text)}
-                  className="rounded-full border border-white/80 bg-white/60 px-4 py-2 text-left text-[13px] font-medium text-ink shadow-[inset_0_1px_0_rgb(255_255_255)] transition-colors hover:bg-white disabled:opacity-50"
-                >
-                  {item.label}
-                </button>
-              ))}
+          {doctors.length > 0 ? (
+            <div>
+              <p className="text-[12px] text-ink-faint">Médecins</p>
+              <ul className="mt-2 space-y-2">
+                {doctors.map((doctor) => (
+                  <li key={doctor.id}>
+                    <a
+                      href={`#patient/medecins/${doctor.id}`}
+                      className="block rounded-2xl border border-white/80 bg-white/70 px-3 py-2.5 shadow-[inset_0_1px_0_rgb(255_255_255)] transition-colors hover:bg-white"
+                    >
+                      <span className="block text-[13px] font-medium text-ink">
+                        {doctor.firstName} {doctor.lastName}
+                      </span>
+                      <span className="mt-0.5 block text-[12px] text-ink-faint">
+                        {doctor.city} · {doctor.establishment}
+                      </span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
             </div>
-            <p className="mt-3 text-[12px] leading-relaxed text-ink-faint">
-              Demande de démonstration, conservée dans cette session. Aucun
-              créneau clinique n'est réservé.
-            </p>
-          </div>
-
-          {recommendation?.specialtyId === "ophthalmology" ? (
-            <a
-              href={OPTHOCARE_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-auto inline-flex items-center justify-center rounded-full bg-ink px-4 py-2.5 text-[13px] font-medium text-white"
-            >
-              Continuer sur OphthoCare
-            </a>
           ) : null}
 
-          {chat.appointments.length > 0 ? (
-            <ul className="space-y-2 border-t border-black/10 pt-3">
-              {chat.appointments.map((item, index) => (
-                <li key={`${item.windowLabel}-${index}`} className="text-[13px] text-ink">
-                  {item.specialtyName} · {item.windowLabel}
-                  <span className="mt-0.5 block text-[12px] text-ink-faint">
-                    {item.liveModule ? "Relais possible via OphthoCare" : "Module pas encore ouvert"}
-                  </span>
-                </li>
-              ))}
-            </ul>
+          {recommendation?.specialtyId && recommendation.urgency !== "urgent" ? (
+            <a
+              href={`#patient/medecins?specialite=${recommendation.specialtyId}`}
+              className="mt-auto inline-flex items-center justify-center rounded-full bg-ink px-4 py-2.5 text-[13px] font-medium text-white"
+            >
+              Trouver un médecin
+            </a>
           ) : null}
         </aside>
       </div>

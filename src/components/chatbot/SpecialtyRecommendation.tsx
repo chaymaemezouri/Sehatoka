@@ -16,7 +16,6 @@ export function SpecialtyRecommendation({
 }: SpecialtyRecommendationProps) {
   const { t } = useLocale()
   const isUrgent = recommendation.urgency === "urgent"
-  const isOphtho = recommendation.specialtyId === "ophthalmology"
   const specialtyLabel = recommendation.specialtyId
     ? t.specialties[recommendation.specialtyId].name
     : recommendation.specialtyName
@@ -45,18 +44,12 @@ export function SpecialtyRecommendation({
               <ShieldAlert className="size-4 text-danger" />
               {specialtyLabel}
             </span>
-          ) : isOphtho ? (
-            "OphthoCare"
           ) : (
             specialtyLabel
           )}
         </p>
         <p className={cn("mt-2 leading-relaxed text-ink-soft", compact ? "text-[11px]" : "text-[13px]")}>
-          {isUrgent
-            ? recommendation.rationale
-            : isOphtho
-              ? t.chat.ophthoLine
-              : recommendation.rationale}
+          {recommendation.rationale}
         </p>
       </div>
 
@@ -74,8 +67,8 @@ export function SpecialtyRecommendation({
           {recommendation.ctaHref && recommendation.ctaLabel ? (
             <a
               href={recommendation.ctaHref}
-              target="_blank"
-              rel="noopener noreferrer"
+              target={recommendation.ctaHref.startsWith("#") ? undefined : "_blank"}
+              rel={recommendation.ctaHref.startsWith("#") ? undefined : "noopener noreferrer"}
               className="inline-flex items-center gap-1 text-[13px] font-medium text-ink transition-opacity hover:opacity-70"
             >
               {recommendation.ctaLabel}

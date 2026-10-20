@@ -1,4 +1,3 @@
-import { OPTHOCARE_URL } from "@/data/site.ts"
 import { getLocale } from "@/i18n/store.ts"
 import { normalizeText } from "@/lib/utils.ts"
 import { detectIntent, detectWindow, intentKind, wantsAppointment } from "@/lib/chat/intents.ts"
@@ -22,70 +21,83 @@ function reply(
   return { content, recommendation }
 }
 
+function attachDirectory(output: ChatTurnOutput): ChatTurnOutput {
+  const recommendation = output.recommendation
+  if (!recommendation?.specialtyId || recommendation.urgency === "urgent") {
+    return output
+  }
+  const english = getLocale() === "en"
+  return {
+    ...output,
+    recommendation: {
+      ...recommendation,
+      ctaLabel: english ? "Find a doctor" : "Trouver un médecin",
+      ctaHref: `#patient/medecins?specialite=${recommendation.specialtyId}`,
+    },
+  }
+}
+
 const responses = {
   greeting: reply(
-    "Bonjour. Je suis Sehatoka AI, un assistant d'orientation en démonstration. Décrivez un besoin ou un inconfort — je vous indiquerai la spécialité la plus cohérente, sans poser de diagnostic.",
+    "Bonjour. Je suis Sehatoka AI. Décrivez ce qui vous amène : je vous oriente vers la spécialité la plus adaptée.",
   ),
   ophthalmology: reply(
-    "Une consultation en ophtalmologie peut être appropriée. OphthoCare peut prendre le relais — sans diagnostic de notre part.",
+    "Une consultation en ophtalmologie peut être appropriée. Ce n'est pas un diagnostic. Après connexion, vous pouvez voir les médecins de cette spécialité et noter une demande de rendez-vous. Aucun créneau n'est réservé ici.",
     {
       specialtyId: "ophthalmology",
       specialtyName: "Ophtalmologie",
       status: "available",
-      rationale:
-        "Module existant — orientation vers OphthoCare pour le parcours oculaire.",
-      ctaLabel: "Accéder à OphthoCare",
-      ctaHref: OPTHOCARE_URL,
+      rationale: "Orientation vers l'ophtalmologie. Les médecins proposés sont ceux du répertoire relié.",
       urgency: "orientation",
     },
   ),
   cardiology: reply(
-    "Des signaux évoquant la sphère cardiaque méritent une attention attentive, sans qu'un diagnostic ne puisse être posé ici. Une consultation en cardiologie peut être envisagée. Ce module n'est pas encore intégré à Sehatoka.",
+    "Des signaux évoquant la sphère cardiaque méritent une attention attentive. Un diagnostic ne peut pas être posé ici. Une consultation en cardiologie peut être envisagée. Vous pouvez ouvrir les fiches de cette spécialité et noter une demande : aucun créneau n'est réservé.",
     {
       specialtyId: "cardiology",
       specialtyName: "Cardiologie",
       status: "upcoming",
-      rationale: "Spécialité envisagée — service en préparation.",
+      rationale: "Orientation vers cette spécialité. Ce n'est pas un diagnostic.",
       urgency: "orientation",
     },
   ),
   dermatology: reply(
-    "Une question cutanée oriente souvent vers la dermatologie. Je ne peux ni identifier une lésion ni confirmer une pathologie à partir d'une description. Le module dermatologique de Sehatoka n'est pas encore disponible.",
+    "Une question cutanée oriente souvent vers la dermatologie. Je ne peux ni identifier une lésion ni confirmer une pathologie. Ce n'est pas un diagnostic. Vous pouvez ouvrir les fiches de cette spécialité et noter une demande : aucun créneau n'est réservé.",
     {
       specialtyId: "dermatology",
       specialtyName: "Dermatologie",
       status: "upcoming",
-      rationale: "Spécialité envisagée — service en préparation.",
+      rationale: "Orientation vers cette spécialité. Ce n'est pas un diagnostic.",
       urgency: "orientation",
     },
   ),
   pediatrics: reply(
-    "Lorsqu'il s'agit d'un enfant, une orientation pédiatrique est généralement la plus adaptée. Ce module n'est pas encore intégré. En cas de doute sur la gravité, une évaluation médicale directe reste la conduite la plus sûre.",
+    "Lorsqu'il s'agit d'un enfant, une orientation pédiatrique est généralement la plus adaptée. Ce n'est pas un diagnostic. En cas de doute sur la gravité, une évaluation médicale directe reste la conduite la plus sûre. Vous pouvez noter une demande : aucun créneau n'est réservé.",
     {
       specialtyId: "pediatrics",
       specialtyName: "Pédiatrie",
       status: "upcoming",
-      rationale: "Spécialité envisagée — service en préparation.",
+      rationale: "Orientation vers cette spécialité. Ce n'est pas un diagnostic.",
       urgency: "orientation",
     },
   ),
   gynecology: reply(
-    "Ce type de besoin relève le plus souvent de la gynécologie. Sehatoka n'interprète pas ces symptômes. Le module dédié est encore en préparation.",
+    "Ce type de besoin relève le plus souvent de la gynécologie. Sehatoka n'interprète pas ces symptômes et ne pose pas de diagnostic. Vous pouvez noter une demande : aucun créneau n'est réservé.",
     {
       specialtyId: "gynecology",
       specialtyName: "Gynécologie",
       status: "upcoming",
-      rationale: "Spécialité envisagée — service en préparation.",
+      rationale: "Orientation vers cette spécialité. Ce n'est pas un diagnostic.",
       urgency: "orientation",
     },
   ),
   psychiatry: reply(
-    "Une demande liée à la santé mentale peut justifier un avis spécialisé en psychiatrie ou, selon le contexte, un premier recours. Ce n'est pas un diagnostic. Le module n'est pas encore disponible sur Sehatoka.",
+    "Une demande liée à la santé mentale peut justifier un avis spécialisé en psychiatrie ou, selon le contexte, un premier recours. Ce n'est pas un diagnostic. Vous pouvez noter une demande : aucun créneau n'est réservé.",
     {
       specialtyId: "psychiatry",
       specialtyName: "Psychiatrie",
       status: "upcoming",
-      rationale: "Spécialité envisagée — service en préparation.",
+      rationale: "Orientation vers cette spécialité. Ce n'est pas un diagnostic.",
       urgency: "orientation",
     },
   ),
@@ -96,12 +108,12 @@ const responses = {
     "Vous pouvez formuler une demande de rendez-vous d'orientation. Indiquez une préférence : matin, après-midi, ou cette semaine. Aucun créneau n'est réservé ici, et aucun professionnel n'est désigné.",
   ),
   generalMedicine: reply(
-    "Pour un inconfort encore indifférencié, la médecine générale est souvent le premier recours le plus sûr. Elle n'est pas encore proposée comme module Sehatoka. Une évaluation médicale reste recommandée plutôt qu'une conclusion ici.",
+    "Pour un inconfort encore indifférencié, la médecine générale est souvent le premier recours le plus sûr. Ce n'est pas un diagnostic. Une évaluation médicale reste recommandée. Vous pouvez noter une demande : aucun créneau n'est réservé.",
     {
       specialtyId: "general-medicine",
       specialtyName: "Médecine générale",
       status: "upcoming",
-      rationale: "Spécialité envisagée — service en préparation.",
+      rationale: "Orientation vers cette spécialité. Ce n'est pas un diagnostic.",
       urgency: "orientation",
     },
   ),
@@ -117,7 +129,7 @@ const responses = {
     },
   ),
   emergency: reply(
-    "Les signes décrits peuvent nécessiter une prise en charge urgente. N'utilisez pas cet assistant pour une situation d'urgence. En France, composez le 15 (SAMU) ou le 112. Si les symptômes sont soudains ou sévères, rendez-vous aux urgences. Pour un mal-être intense, le 3114 est également disponible.",
+    "Les signes décrits peuvent nécessiter une prise en charge urgente. N'utilisez pas cet assistant pour une situation d'urgence et ne poursuivez pas une demande de rendez-vous. Au Maroc, contactez le SAMU au 141 ou rendez-vous aux urgences. En France, le 15 et le 112, et le 3114 en cas de mal-être intense.",
     {
       specialtyName: "Soins urgents",
       status: "urgent",
@@ -130,17 +142,15 @@ const responses = {
 
 const responsesEn = {
   greeting: reply(
-    "Hello. I am Sehatoka AI, a guidance assistant in demonstration. Describe a need or a discomfort — I will point you to the most fitting specialty, without making a diagnosis.",
+    "Hello. I am Sehatoka AI. Describe what brings you here, and I will guide you toward the most fitting specialty.",
   ),
   ophthalmology: reply(
-    "An ophthalmology visit may be appropriate. OphthoCare can take the next step — we do not make a diagnosis.",
+    "An ophthalmology visit may be appropriate. This is not a diagnosis. After you sign in, you can see doctors in this specialty and note an appointment request. No slot is reserved here.",
     {
       specialtyId: "ophthalmology",
       specialtyName: "Ophthalmology",
       status: "available",
-      rationale: "Existing module — guidance toward OphthoCare for the eye pathway.",
-      ctaLabel: "Open OphthoCare",
-      ctaHref: OPTHOCARE_URL,
+      rationale: "Guidance toward ophthalmology. Listed doctors come from the connected directory.",
       urgency: "orientation",
     },
   ),
@@ -150,7 +160,7 @@ const responsesEn = {
       specialtyId: "cardiology",
       specialtyName: "Cardiology",
       status: "upcoming",
-      rationale: "Specialty considered.",
+      rationale: "Guidance toward this specialty. This is not a diagnosis.",
       urgency: "orientation",
     },
   ),
@@ -160,7 +170,7 @@ const responsesEn = {
       specialtyId: "dermatology",
       specialtyName: "Dermatology",
       status: "upcoming",
-      rationale: "Specialty considered.",
+      rationale: "Guidance toward this specialty. This is not a diagnosis.",
       urgency: "orientation",
     },
   ),
@@ -170,7 +180,7 @@ const responsesEn = {
       specialtyId: "pediatrics",
       specialtyName: "Pediatrics",
       status: "upcoming",
-      rationale: "Specialty considered.",
+      rationale: "Guidance toward this specialty. This is not a diagnosis.",
       urgency: "orientation",
     },
   ),
@@ -180,7 +190,7 @@ const responsesEn = {
       specialtyId: "gynecology",
       specialtyName: "Gynecology",
       status: "upcoming",
-      rationale: "Specialty considered.",
+      rationale: "Guidance toward this specialty. This is not a diagnosis.",
       urgency: "orientation",
     },
   ),
@@ -190,7 +200,7 @@ const responsesEn = {
       specialtyId: "psychiatry",
       specialtyName: "Psychiatry",
       status: "upcoming",
-      rationale: "Specialty considered.",
+      rationale: "Guidance toward this specialty. This is not a diagnosis.",
       urgency: "orientation",
     },
   ),
@@ -206,7 +216,7 @@ const responsesEn = {
       specialtyId: "general-medicine",
       specialtyName: "General medicine",
       status: "upcoming",
-      rationale: "Specialty considered.",
+      rationale: "Guidance toward this specialty. This is not a diagnosis.",
       urgency: "orientation",
     },
   ),
@@ -278,22 +288,17 @@ function bookingTurn(
   }
 
   const recommendation = latestRecommendation(history)
-  const liveModule = recommendation?.specialtyId === "ophthalmology"
   const english = getLocale() === "en"
 
   return {
-    content: liveModule
-      ? english
-        ? `Request noted for this session. Preference: ${windowLabel}. No slot is reserved and no professional is assigned. OphthoCare can continue the eye pathway.`
-        : `Demande notée pour cette session. Préférence : ${windowLabel}. Aucun créneau n'est réservé et aucun professionnel n'est désigné. OphthoCare peut poursuivre le parcours oculaire.`
-      : english
-        ? `Request noted for this session. Preference: ${windowLabel}. Nothing is reserved.`
-        : `Demande notée pour cette session. Préférence : ${windowLabel}. Ce module n'ouvre pas encore de rendez-vous : rien n'est réservé.`,
+    content: english
+      ? `Preference noted for this conversation: ${windowLabel}. No appointment is reserved. Sign in to open the doctors for this specialty and record a request.`
+      : `Préférence notée pour cette conversation : ${windowLabel}. Aucun rendez-vous n'est réservé. Connectez-vous pour ouvrir les médecins de cette spécialité et noter une demande.`,
     recommendation,
     appointment: {
-      specialtyName: recommendation?.specialtyName ?? "Orientation générale",
+      specialtyName: recommendation?.specialtyName ?? (english ? "General guidance" : "Orientation générale"),
       windowLabel,
-      liveModule,
+      liveModule: false,
     },
   }
 }
@@ -313,7 +318,7 @@ export class DemoChatAdapter implements ChatAdapter {
     const replies = activeResponses()
     const booking = bookingTurn(input.userMessage, input.history, intent)
     if (booking) {
-      return booking
+      return attachDirectory(booking)
     }
 
     if (isPrepareRequest(input.userMessage)) {
@@ -324,23 +329,23 @@ export class DemoChatAdapter implements ChatAdapter {
       case intentKind.emergency:
         return replies.emergency
       case intentKind.ophthalmology:
-        return replies.ophthalmology
+        return attachDirectory(replies.ophthalmology)
       case intentKind.cardiology:
-        return replies.cardiology
+        return attachDirectory(replies.cardiology)
       case intentKind.dermatology:
-        return replies.dermatology
+        return attachDirectory(replies.dermatology)
       case intentKind.pediatrics:
-        return replies.pediatrics
+        return attachDirectory(replies.pediatrics)
       case intentKind.gynecology:
-        return replies.gynecology
+        return attachDirectory(replies.gynecology)
       case intentKind.psychiatry:
-        return replies.psychiatry
+        return attachDirectory(replies.psychiatry)
       case intentKind.generalMedicine:
-        return replies.generalMedicine
+        return attachDirectory(replies.generalMedicine)
       case intentKind.greeting:
         return replies.greeting
       default:
-        return replies.uncertain
+        return attachDirectory(replies.uncertain)
     }
   }
 }

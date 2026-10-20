@@ -159,3 +159,37 @@
   background: rgb(12 21 38 / 0.18);
   border-radius: 999px;
 }
+
+@keyframes sehatoka-sheen {
+  0%,
+  58% {
+    transform: translateX(-140%);
+  }
+  100% {
+    transform: translateX(220%);
+  }
+}
+
+.sehatoka-sheen {
+  animation: sehatoka-sheen 5.8s ease-in-out infinite;
+}
+
+@keyframes sehatoka-swipe {
+  0%,
+  20% {
+    transform: translateX(6px);
+    opacity: 0.35;
+  }
+  70% {
+    transform: translateX(-8px);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-12px);
+    opacity: 0;
+  }
+}
+
+.sehatoka-swipe {
+  animation: sehatoka-swipe 1.6s ease-in-out infinite;
+}

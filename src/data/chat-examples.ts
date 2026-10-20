@@ -1,4 +1,3 @@
-import { OPTHOCARE_URL } from "./site.ts"
 import type { ChatMessage } from "@/types/chat.ts"
 
 export const welcomeMessage: ChatMessage = {
@@ -21,7 +20,7 @@ export const exampleThread: ChatMessage[] = [
     id: "example-assistant",
     role: "assistant",
     content:
-      "Une consultation en ophtalmologie peut être appropriée. OphthoCare peut prendre le relais.",
+      "Une consultation en ophtalmologie peut être appropriée. Ce n'est pas un diagnostic.",
     createdAt: "2026-10-13T08:00:14.000Z",
     isExample: true,
     recommendation: {
@@ -29,9 +28,9 @@ export const exampleThread: ChatMessage[] = [
       specialtyName: "Ophtalmologie",
       status: "available",
       rationale:
-        "Module existant — orientation vers OphthoCare pour le parcours oculaire.",
-      ctaLabel: "Accéder à OphthoCare",
-      ctaHref: OPTHOCARE_URL,
+        "Orientation vers l'ophtalmologie, avec les médecins proposés pour cette spécialité.",
+      ctaLabel: "Trouver un médecin",
+      ctaHref: "#patient/medecins?specialite=ophthalmology",
       urgency: "orientation",
     },
   },
