@@ -10,7 +10,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "server:verify": "npm --prefix server run verify"
   },
   "dependencies": {
     "@radix-ui/react-scroll-area": "^1.4.0",

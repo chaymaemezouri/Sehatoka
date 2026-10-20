@@ -68,7 +68,7 @@ export function DocumentsPage() {
                 <p className="mt-0.5 text-[12px] text-ink-faint">{formatWhen(item.addedAt, locale)} · {formatSize(item.size)}</p>
               </div>
               <div className="flex gap-2">
-                <button type="button" onClick={() => void openDocument(item.id)} className="h-9 rounded-full bg-[#161616] px-3 text-[13px] font-medium text-white">{en ? "Open" : "Ouvrir"}</button>
+                <button type="button" onClick={() => void openDocument(item.id)} className="h-9 rounded-full bg-[#9a4e66] px-3 text-[13px] font-medium text-white">{en ? "Open" : "Ouvrir"}</button>
                 <button type="button" onClick={() => void removeDocument(account.id, item.id)} className="h-9 rounded-full px-3 text-[13px] font-medium text-ink-soft">{en ? "Remove" : "Retirer"}</button>
               </div>
             </li>
@@ -118,7 +118,7 @@ export function PrescriptionsPage() {
           <Label name="date" label={en ? "Date" : "Date"} type="date" />
           <Label name="prescriber" label={en ? "Prescriber" : "Prescripteur"} />
           <Note name="note" label={en ? "Note" : "Note"} />
-          <button type="submit" className="h-11 rounded-full bg-[#161616] px-5 text-[14px] font-medium text-white sm:col-span-2 sm:justify-self-start">{en ? "Save" : "Enregistrer"}</button>
+          <button type="submit" className="h-11 rounded-full bg-[#9a4e66] px-5 text-[14px] font-medium text-white sm:col-span-2 sm:justify-self-start">{en ? "Save" : "Enregistrer"}</button>
         </form>
       </Panel>
       {records.prescriptions.length === 0 ? (
@@ -182,7 +182,7 @@ export function LabsPage() {
           <Label name="date" label={en ? "Date" : "Date"} type="date" />
           <Label name="value" label={en ? "Result" : "Résultat"} />
           <Note name="note" label={en ? "Note" : "Note"} />
-          <button type="submit" className="h-11 rounded-full bg-[#161616] px-5 text-[14px] font-medium text-white sm:col-span-2 sm:justify-self-start">{en ? "Save" : "Enregistrer"}</button>
+          <button type="submit" className="h-11 rounded-full bg-[#9a4e66] px-5 text-[14px] font-medium text-white sm:col-span-2 sm:justify-self-start">{en ? "Save" : "Enregistrer"}</button>
         </form>
       </Panel>
       {records.labs.length === 0 ? (
@@ -236,7 +236,7 @@ export function VaccinesPanel() {
           <Label className="sm:col-span-2" name="name" label={en ? "Vaccine" : "Vaccin"} required />
           <Label name="date" label={en ? "Date" : "Date"} type="date" />
           <Label name="note" label={en ? "Note" : "Note"} />
-          <button type="submit" className="h-11 rounded-full bg-[#161616] px-5 text-[14px] font-medium text-white sm:col-span-2 sm:justify-self-start">{en ? "Add" : "Ajouter"}</button>
+          <button type="submit" className="h-11 rounded-full bg-[#9a4e66] px-5 text-[14px] font-medium text-white sm:col-span-2 sm:justify-self-start">{en ? "Add" : "Ajouter"}</button>
         </form>
       </Panel>
       {records.vaccines.length === 0 ? (

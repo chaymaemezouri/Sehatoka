@@ -207,29 +207,56 @@ function SignupForm() {
 
 function ResetForm() {
   const { locale } = useLocale()
-  const { resetPassword, mode } = useAuth()
+  const { requestPasswordReset, confirmPasswordReset, mode } = useAuth()
   const en = locale === "en"
+  const [step, setStep] = useState<"email" | "code">("email")
   const [email, setEmail] = useState("")
+  const [token, setToken] = useState("")
   const [password, setPassword] = useState("")
   const [show, setShow] = useState(false)
   const [error, setError] = useState("")
-  const [done, setDone] = useState(false)
+  const [notice, setNotice] = useState("")
   const [pending, setPending] = useState(false)
 
   const onSubmit = async (event: FormEvent) => {
     event.preventDefault()
-    if (!passwordIsStrong(password)) {
-      setError(en ? "Use at least 8 characters, with a letter and a number." : "Utilisez au moins 8 caractères, avec une lettre et un chiffre.")
+    setError("")
+    if (step === "email") {
+      if (!emailPattern.test(email.trim())) {
+        setError(en ? "Enter a valid email." : "Indiquez un e-mail valide.")
+        return
+      }
+      setPending(true)
+      try {
+        await requestPasswordReset(email)
+        setNotice(en
+          ? "If an account matches this email, a message lets you choose a new password."
+          : "Si un compte correspond à cet e-mail, un message permet de choisir un nouveau mot de passe.")
+        setStep("code")
+      } catch (caught) {
+        setError(failureText(caught, en))
+      } finally {
+        setPending(false)
+      }
+      return
+    }
+    if (!token.trim() || !passwordIsStrong(password)) {
+      setError(en ? "Enter the code and a password of 8 characters, with a letter and a number." : "Indiquez le code et un mot de passe de 8 caractères, avec une lettre et un chiffre.")
       return
     }
     setPending(true)
-    setError("")
     try {
-      await resetPassword(email, password)
-      setDone(true)
+      await confirmPasswordReset(token.trim(), password)
+      setNotice(en ? "Your password has been updated." : "Votre mot de passe a été mis à jour.")
       setPassword("")
+      setToken("")
     } catch (caught) {
-      setError(failureText(caught, en))
+      setNotice("")
+      if (isAuthError(caught) && caught.failure === "invalid") {
+        setError(en ? "This code is not valid." : "Ce code n'est pas valable.")
+      } else {
+        setError(failureText(caught, en))
+      }
     } finally {
       setPending(false)
     }
@@ -243,12 +270,18 @@ function ResetForm() {
           {en ? "Choose a new password for your account." : "Choisissez un nouveau mot de passe pour votre compte."}
         </p>
       </header>
-      {done ? <p className="text-[13px] text-emerald" role="status">{en ? "Your password has been updated." : "Votre mot de passe a été mis à jour."}</p> : null}
+      {notice ? <p className="text-[13px] text-emerald" role="status">{notice}</p> : null}
       {error ? <p className="text-[13px] text-danger" role="alert">{error}</p> : null}
-      <TextField label={en ? "Email" : "E-mail"} type="email" value={email} autoComplete="email" onChange={setEmail} />
-      <PasswordField label={en ? "New password" : "Nouveau mot de passe"} value={password} shown={show} autoComplete="new-password" onToggle={() => setShow((value) => !value)} onChange={setPassword} />
+      {step === "email" ? (
+        <TextField label={en ? "Email" : "E-mail"} type="email" value={email} autoComplete="email" onChange={setEmail} />
+      ) : (
+        <>
+          <TextField label={en ? "Code" : "Code"} value={token} autoComplete="one-time-code" onChange={setToken} />
+          <PasswordField label={en ? "New password" : "Nouveau mot de passe"} value={password} shown={show} autoComplete="new-password" onToggle={() => setShow((value) => !value)} onChange={setPassword} />
+        </>
+      )}
       <button type="submit" disabled={pending || mode === "unavailable"} className="inline-flex h-11 w-full items-center justify-center rounded-full bg-[#161616] text-[14px] font-medium text-white hover:bg-black disabled:opacity-50">
-        {pending ? (en ? "Updating…" : "Mise à jour…") : en ? "Update password" : "Mettre à jour"}
+        {pending ? (en ? "Updating…" : "Mise à jour…") : step === "email" ? (en ? "Continue" : "Continuer") : en ? "Update password" : "Mettre à jour"}
       </button>
       <a href="#connexion" className="inline-block text-[13px] font-medium text-ink">{en ? "Back to sign in" : "Retour à la connexion"}</a>
     </form>
@@ -383,6 +416,12 @@ function failureText(error: unknown, en: boolean) {
   }
   if (error.failure === "missing") {
     return en ? "No account matches this email." : "Aucun compte ne correspond à cet e-mail."
+  }
+  if (error.failure === "rate") {
+    return en ? "Too many attempts. Try again in a few minutes." : "Trop de tentatives. Réessayez dans quelques minutes."
+  }
+  if (error.failure === "rejected") {
+    return en ? "The request could not be verified. Reload the page." : "La requête n'a pas pu être vérifiée. Rechargez la page."
   }
   return en
     ? "Authentication is not connected. Set a real auth service before using this in production."

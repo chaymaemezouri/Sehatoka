@@ -1,20 +1,13 @@
 import {
   Bell,
   CalendarClock,
-  FileText,
-  FlaskConical,
   FolderHeart,
   LayoutDashboard,
   LogOut,
   Menu,
-  Pill,
-  Receipt,
   Search,
-  Settings,
-  Shield,
   Sparkles,
   Stethoscope,
-  UserRound,
   X,
 } from "lucide-react"
 import { useEffect, useState, type FormEvent, type ReactNode } from "react"
@@ -27,6 +20,7 @@ import { AppointmentsPage } from "@/patient/Appointments.tsx"
 import { DoctorsPage } from "@/patient/Doctors.tsx"
 import { HealthRecordsPage } from "@/patient/HealthPages.tsx"
 import { DocumentsPage, LabsPage, PrescriptionsPage } from "@/patient/Records.tsx"
+import { FollowUpPage } from "@/patient/FollowUp.tsx"
 import { Overview } from "@/patient/Overview.tsx"
 import { cn } from "@/lib/utils.ts"
 
@@ -75,7 +69,7 @@ export function PatientPortal({ path, params }: { path: string; params: URLSearc
   const account = auth.account
   const initials = `${account.firstName[0] ?? ""}${account.lastName[0] ?? ""}`.toUpperCase()
   const items = navItems(en)
-  const current = items.find((item) => isActive(path, item.path))
+  const current = items.find((item) => isActive(path, item))
 
   return (
     <div className="relative min-h-svh text-ink">
@@ -115,7 +109,7 @@ export function PatientPortal({ path, params }: { path: string; params: URLSearc
                 <input name="q" placeholder={en ? "Search a doctor" : "Rechercher un médecin"} className="h-9 w-56 rounded-full border border-white/80 bg-white/70 pr-3 pl-9 text-[13px] outline-none" />
               </label>
             </form>
-            <a href="#patient/rendez-vous/nouveau" className="hidden h-10 items-center rounded-full bg-[#161616] px-4 text-[13px] font-medium text-white sm:inline-flex">
+            <a href="#patient/rendez-vous/nouveau" className="hidden h-10 items-center rounded-full bg-[#9a4e66] px-4 text-[13px] font-medium text-white transition-colors hover:bg-[#864257] sm:inline-flex">
               {en ? "Request" : "Demande"}
             </a>
             <a href="#patient/notifications" className="relative grid size-9 place-items-center rounded-full bg-white/70" aria-label={en ? "Notifications" : "Notifications"}>
@@ -123,14 +117,17 @@ export function PatientPortal({ path, params }: { path: string; params: URLSearc
               {unread > 0 ? <span className="absolute top-1.5 right-1.5 size-2 rounded-full bg-emerald" /> : null}
             </a>
             <div className="relative">
-              <button type="button" className="inline-flex h-9 items-center gap-2 rounded-full bg-[#161616] pr-3 pl-1 text-white" aria-expanded={accountMenu} onClick={() => setAccountMenu((value) => !value)}>
-                <span className="grid size-8 place-items-center rounded-full bg-white/15 text-[11px]">{initials}</span>
+              <button type="button" className="inline-flex h-9 items-center gap-2 rounded-full border border-white/80 bg-white/75 pr-3 pl-1 text-ink" aria-expanded={accountMenu} onClick={() => setAccountMenu((value) => !value)}>
+                <span className="grid size-8 place-items-center rounded-full bg-[#f3d5df] text-[11px] text-[#7a3a50]">{initials}</span>
                 <span className="hidden max-w-24 truncate text-[13px] sm:block">{account.firstName}</span>
               </button>
               {accountMenu ? (
                 <div className="absolute right-0 mt-2 w-52 rounded-2xl border border-black/10 bg-white p-1 shadow-[var(--shadow-soft)]">
                   <MenuLink href="#patient/profil">{en ? "Profile" : "Profil"}</MenuLink>
+                  <MenuLink href="#patient/notifications">{en ? "Notifications" : "Notifications"}</MenuLink>
+                  <MenuLink href="#patient/paiements">{en ? "Payments" : "Paiements"}</MenuLink>
                   <MenuLink href="#patient/confidentialite">{en ? "Privacy" : "Confidentialité"}</MenuLink>
+                  <MenuLink href="#patient/reglages">{en ? "Settings" : "Réglages"}</MenuLink>
                   <button
                     type="button"
                     className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-[13px] hover:bg-canvas"
@@ -173,6 +170,9 @@ function Page({ path, params }: { path: string; params: URLSearchParams }) {
   }
   if (path === "patient/rendez-vous" || path.startsWith("patient/rendez-vous/")) {
     return <AppointmentsPage path={path} params={params} />
+  }
+  if (path === "patient/suivi") {
+    return <FollowUpPage />
   }
   if (path === "patient/dossier") {
     return <HealthRecordsPage />
@@ -217,50 +217,38 @@ function Sidebar({
   onToggle?: () => void
   onNavigate?: () => void
 }) {
-  const groups = [
-    { label: en ? "Care" : "Parcours", items: navItems(en).slice(0, 4) },
-    { label: en ? "Health" : "Santé", items: navItems(en).slice(4, 8) },
-    { label: en ? "Account" : "Compte", items: navItems(en).slice(8) },
-  ]
   return (
     <>
       <div className="flex h-16 items-center justify-between px-4">
         <a href="#accueil" className={cn("font-medium tracking-[-0.03em]", collapsed && "sr-only")}>Sehatoka</a>
         {onToggle ? (
-          <button type="button" onClick={onToggle} className="grid size-8 place-items-center rounded-full text-ink-soft hover:bg-black/5" aria-label={en ? "Collapse menu" : "Réduire le menu"}>
+          <button type="button" onClick={onToggle} className="grid size-8 place-items-center rounded-full text-ink-soft hover:bg-white/70" aria-label={en ? "Collapse menu" : "Réduire le menu"}>
             {collapsed ? <Menu className="size-4" /> : <X className="size-4" />}
           </button>
         ) : null}
       </div>
-      <nav className="flex-1 space-y-5 overflow-y-auto px-3 pb-6">
-        {groups.map((group) => (
-          <div key={group.label}>
-            <p className={cn("px-2 text-[11px] font-medium tracking-[0.14em] text-ink-faint uppercase", collapsed && "sr-only")}>{group.label}</p>
-            <div className="mt-1 space-y-1">
-              {group.items.map((item) => {
-                const active = isActive(path, item.path)
-                const Icon = item.icon
-                return (
-                  <a
-                    key={item.path}
-                    href={item.href}
-                    title={item.label}
-                    onClick={onNavigate}
-                    className={cn(
-                      "flex h-10 items-center gap-2 rounded-2xl px-2.5 text-[13px] font-medium",
-                      active ? "bg-[#161616] text-white" : "text-ink-soft hover:bg-white/70 hover:text-ink",
-                      collapsed && "justify-center",
-                    )}
-                    aria-current={active ? "page" : undefined}
-                  >
-                    <Icon className="size-4 shrink-0" />
-                    <span className={cn(collapsed && "sr-only")}>{item.label}</span>
-                  </a>
-                )
-              })}
-            </div>
-          </div>
-        ))}
+      <nav className="flex-1 space-y-1 overflow-y-auto px-3 pb-6">
+        {navItems(en).map((item) => {
+          const active = isActive(path, item)
+          const Icon = item.icon
+          return (
+            <a
+              key={item.path}
+              href={item.href}
+              title={item.label}
+              onClick={onNavigate}
+              className={cn(
+                "flex h-11 items-center gap-2.5 rounded-2xl px-3 text-[14px] font-medium",
+                active ? "bg-[#f6dde4] text-[#7a3a50]" : "text-ink-soft hover:bg-white/70 hover:text-ink",
+                collapsed && "justify-center px-0",
+              )}
+              aria-current={active ? "page" : undefined}
+            >
+              <Icon className="size-4 shrink-0" />
+              <span className={cn(collapsed && "sr-only")}>{item.label}</span>
+            </a>
+          )
+        })}
       </nav>
     </>
   )
@@ -304,9 +292,9 @@ function Onboarding({
         <p className="mt-3 text-[14px] leading-relaxed text-ink-soft">{steps[step]}</p>
         <div className="mt-6 flex flex-wrap gap-2">
           {step < steps.length - 1 ? (
-            <button type="button" onClick={() => onStep(step + 1)} className="h-10 rounded-full bg-[#161616] px-4 text-[13px] font-medium text-white">{en ? "Continue" : "Continuer"}</button>
+            <button type="button" onClick={() => onStep(step + 1)} className="h-10 rounded-full bg-[#9a4e66] px-4 text-[13px] font-medium text-white">{en ? "Continue" : "Continuer"}</button>
           ) : (
-            <a href="#patient/assistant" onClick={onClose} className="inline-flex h-10 items-center rounded-full bg-[#161616] px-4 text-[13px] font-medium text-white">{en ? "Open the assistant" : "Ouvrir l'assistant"}</a>
+            <a href="#patient/assistant" onClick={onClose} className="inline-flex h-10 items-center rounded-full bg-[#9a4e66] px-4 text-[13px] font-medium text-white">{en ? "Open the assistant" : "Ouvrir l'assistant"}</a>
           )}
           <button type="button" onClick={onClose} className="h-10 rounded-full px-4 text-[13px] font-medium text-ink-soft">{en ? "Skip" : "Passer"}</button>
         </div>
@@ -315,27 +303,26 @@ function Onboarding({
   )
 }
 
-function isActive(path: string, itemPath: string) {
-  if (itemPath === "patient") {
+function isActive(path: string, item: { path: string; also?: string[] }) {
+  if (item.path === "patient") {
     return path === "patient"
   }
-  return path === itemPath || path.startsWith(`${itemPath}/`)
+  const names = [item.path, ...(item.also ?? [])]
+  return names.some((name) => path === name || path.startsWith(`${name}/`))
 }
 
 function navItems(en: boolean) {
   return [
-    { href: "#patient", path: "patient", label: en ? "Overview" : "Vue d'ensemble", icon: LayoutDashboard },
+    { href: "#patient", path: "patient", label: en ? "Home" : "Accueil", icon: LayoutDashboard },
     { href: "#patient/assistant", path: "patient/assistant", label: en ? "Assistant" : "Assistant", icon: Sparkles },
     { href: "#patient/medecins", path: "patient/medecins", label: en ? "Doctors" : "Médecins", icon: Stethoscope },
-    { href: "#patient/rendez-vous", path: "patient/rendez-vous", label: en ? "Requests" : "Rendez-vous", icon: CalendarClock },
-    { href: "#patient/dossier", path: "patient/dossier", label: en ? "Records" : "Dossier", icon: FolderHeart },
-    { href: "#patient/ordonnances", path: "patient/ordonnances", label: en ? "Prescriptions" : "Ordonnances", icon: Pill },
-    { href: "#patient/analyses", path: "patient/analyses", label: en ? "Lab results" : "Analyses", icon: FlaskConical },
-    { href: "#patient/documents", path: "patient/documents", label: en ? "Documents" : "Documents", icon: FileText },
-    { href: "#patient/notifications", path: "patient/notifications", label: en ? "Notifications" : "Notifications", icon: Bell },
-    { href: "#patient/paiements", path: "patient/paiements", label: en ? "Payments" : "Paiements", icon: Receipt },
-    { href: "#patient/profil", path: "patient/profil", label: en ? "Profile" : "Profil", icon: UserRound },
-    { href: "#patient/confidentialite", path: "patient/confidentialite", label: en ? "Privacy" : "Confidentialité", icon: Shield },
-    { href: "#patient/reglages", path: "patient/reglages", label: en ? "Settings" : "Réglages", icon: Settings },
+    { href: "#patient/rendez-vous", path: "patient/rendez-vous", label: en ? "Requests" : "Demandes", icon: CalendarClock },
+    {
+      href: "#patient/suivi",
+      path: "patient/suivi",
+      label: en ? "Follow-up" : "Suivi",
+      icon: FolderHeart,
+      also: ["patient/documents", "patient/ordonnances", "patient/analyses", "patient/dossier"],
+    },
   ]
 }

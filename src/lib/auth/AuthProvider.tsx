@@ -49,6 +49,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       changePassword: (currentPassword: string, nextPassword: string) =>
         gateway.changePassword(currentPassword, nextPassword),
       resetPassword: (email: string, nextPassword: string) => gateway.resetPassword(email, nextPassword),
+      requestPasswordReset: (email: string) => gateway.requestPasswordReset(email),
+      confirmPasswordReset: (token: string, password: string) => gateway.confirmPasswordReset(token, password),
       deleteAccount: async () => {
         await gateway.deleteAccount()
         setAccount(null)

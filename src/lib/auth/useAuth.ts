@@ -11,6 +11,8 @@ export interface AuthContextValue {
   updateProfile: (patch: Partial<PatientAccount>) => Promise<PatientAccount>
   changePassword: (currentPassword: string, nextPassword: string) => Promise<void>
   resetPassword: (email: string, nextPassword: string) => Promise<void>
+  requestPasswordReset: (email: string) => Promise<void>
+  confirmPasswordReset: (token: string, password: string) => Promise<void>
   deleteAccount: () => Promise<void>
 }
 

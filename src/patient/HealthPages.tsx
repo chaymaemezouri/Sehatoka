@@ -49,13 +49,13 @@ export function HealthRecordsPage() {
         <h1 className="text-[1.7rem] font-medium tracking-[-0.04em]">{en ? "Health records" : "Dossier de santé"}</h1>
         <p className="mt-2 max-w-2xl text-[14px] leading-relaxed text-ink-soft">
           {en
-            ? "What you type is self-declared. Clinician notes, prescriptions, and verified records are not stored here."
-            : "Ce que vous écrivez est déclaré par vous. Les notes du soignant, les ordonnances et les dossiers vérifiés ne sont pas stockés ici."}
+            ? "Allergies, treatments, vaccines, and the requests you noted."
+            : "Allergies, traitements, vaccins et demandes que vous avez notées."}
         </p>
       </header>
       <div className="flex gap-2 overflow-x-auto">
         {tabs.map((item) => (
-          <button key={item} type="button" onClick={() => setTab(item)} className={`h-9 shrink-0 rounded-full px-3 text-[13px] ${tab === item ? "bg-navy text-white" : "border border-black/10"}`} aria-pressed={tab === item}>
+          <button key={item} type="button" onClick={() => setTab(item)} className={`h-9 shrink-0 rounded-full px-3 text-[13px] ${tab === item ? "bg-[#f6dde4] text-[#7a3a50]" : "border border-white/80 bg-white/50"}`} aria-pressed={tab === item}>
             {tabLabel(item, en)}
           </button>
         ))}
@@ -94,7 +94,7 @@ export function HealthRecordsPage() {
             {tab === "history" ? <Area name="conditions" label={en ? "Conditions you want to note" : "Antécédents que vous souhaitez noter"} defaultValue={account.conditions} /> : null}
             {tab === "allergies" ? <Area name="allergies" label={en ? "Allergies you want to note" : "Allergies que vous souhaitez noter"} defaultValue={account.allergies} /> : null}
             {tab === "medications" ? <Area name="medicationsNote" label={en ? "Treatments you want to note" : "Traitements que vous souhaitez noter"} defaultValue={account.medicationsNote} /> : null}
-            <button type="submit" className="h-11 rounded-full bg-[#161616] px-5 text-[14px] font-medium text-white">{en ? "Save" : "Enregistrer"}</button>
+            <button type="submit" className="h-11 rounded-full bg-[#9a4e66] px-5 text-[14px] font-medium text-white">{en ? "Save" : "Enregistrer"}</button>
           </Panel>
         </form>
       )}

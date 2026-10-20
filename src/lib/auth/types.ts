@@ -28,9 +28,9 @@ export interface RegisterInput {
   language: "fr" | "en"
 }
 
-export type AuthMode = "demo" | "unavailable"
+export type AuthMode = "demo" | "api" | "unavailable"
 
-export type AuthFailure = "invalid" | "exists" | "unavailable" | "weak" | "missing"
+export type AuthFailure = "invalid" | "exists" | "unavailable" | "weak" | "missing" | "rate" | "rejected"
 
 export interface AuthGateway {
   readonly mode: AuthMode
@@ -41,5 +41,7 @@ export interface AuthGateway {
   updateProfile: (patch: Partial<PatientAccount>) => Promise<PatientAccount>
   changePassword: (currentPassword: string, nextPassword: string) => Promise<void>
   resetPassword: (email: string, nextPassword: string) => Promise<void>
+  requestPasswordReset: (email: string) => Promise<void>
+  confirmPasswordReset: (token: string, password: string) => Promise<void>
   deleteAccount: () => Promise<void>
 }

@@ -9,6 +9,9 @@ import { createId } from "@/lib/utils.ts"
 
 const usersKey = "sehatoka-demo-users"
 const sessionKey = "sehatoka-demo-session"
+const ready = import.meta.env.DEV
+  ? import("./demo-showcase.ts").then((mod) => mod.ensureDemoShowcase()).catch(() => undefined)
+  : Promise.resolve()
 
 interface StoredUser {
   passwordHash: string
@@ -69,6 +72,7 @@ export function createDemoGateway(): AuthGateway {
   return {
     mode: "demo",
     async current() {
+      await ready
       const id = persistentGet(sessionKey)
       if (!id) {
         return null
@@ -76,6 +80,7 @@ export function createDemoGateway(): AuthGateway {
       return readUsers().find((user) => user.account.id === id)?.account ?? null
     },
     async register(input) {
+      await ready
       if (!passwordIsStrong(input.password)) {
         throw new AuthError("weak")
       }
@@ -91,6 +96,7 @@ export function createDemoGateway(): AuthGateway {
       return account
     },
     async login(email, password) {
+      await ready
       const normalized = email.trim().toLowerCase()
       const user = readUsers().find((item) => item.account.email === normalized)
       if (!user || user.passwordHash !== (await passwordHash(normalized, password))) {
@@ -103,6 +109,7 @@ export function createDemoGateway(): AuthGateway {
       persistentRemove(sessionKey)
     },
     async updateProfile(patch) {
+      await ready
       const id = persistentGet(sessionKey)
       const users = readUsers()
       const index = users.findIndex((user) => user.account.id === id)
@@ -121,6 +128,7 @@ export function createDemoGateway(): AuthGateway {
       return account
     },
     async changePassword(currentPassword, nextPassword) {
+      await ready
       if (!passwordIsStrong(nextPassword)) {
         throw new AuthError("weak")
       }
@@ -138,7 +146,14 @@ export function createDemoGateway(): AuthGateway {
       users[index] = { ...current, passwordHash: await passwordHash(email, nextPassword) }
       writeUsers(users)
     },
+    async requestPasswordReset() {
+      return undefined
+    },
+    async confirmPasswordReset() {
+      throw new AuthError("invalid")
+    },
     async resetPassword(email, nextPassword) {
+      await ready
       if (!passwordIsStrong(nextPassword)) {
         throw new AuthError("weak")
       }
@@ -153,6 +168,7 @@ export function createDemoGateway(): AuthGateway {
       writeUsers(users)
     },
     async deleteAccount() {
+      await ready
       const id = persistentGet(sessionKey)
       if (!id) {
         throw new AuthError("missing")

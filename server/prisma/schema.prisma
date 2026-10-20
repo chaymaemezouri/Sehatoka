@@ -1,0 +1,116 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Patient {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  firstName    String
+  lastName     String
+  phone        String
+  birthDate    DateTime @db.Date
+  language     String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  profile      PatientProfile?
+  sessions     Session[]
+  resets       PasswordReset[]
+  careRequests CareRequest[]
+  documents    PatientDocument[]
+  recordNotes  RecordNote[]
+}
+
+model PatientProfile {
+  patientId       String  @id
+  patient         Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  city            String  @default("")
+  bloodGroup      String  @default("")
+  allergies       String  @default("")
+  conditions      String  @default("")
+  medicationsNote String  @default("")
+  emergencyName   String  @default("")
+  emergencyPhone  String  @default("")
+  onboarded       Boolean @default(false)
+  notifyInApp     Boolean @default(true)
+  shareWithCare   Boolean @default(false)
+}
+
+model Session {
+  id        String    @id @default(cuid())
+  patientId String
+  patient   Patient   @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([patientId])
+}
+
+model PasswordReset {
+  id        String    @id @default(cuid())
+  patientId String
+  patient   Patient   @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([patientId])
+}
+
+model AuthAttempt {
+  id        String   @id @default(cuid())
+  subject   String
+  createdAt DateTime @default(now())
+
+  @@index([subject, createdAt])
+}
+
+/// Réservé à une prochaine étape. Aucune donnée n'est insérée ici.
+model CareRequest {
+  id          String   @id @default(cuid())
+  patientId   String
+  patient     Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  specialtyId String
+  mode        String
+  window      String
+  status      String
+  createdAt   DateTime @default(now())
+
+  @@index([patientId])
+}
+
+/// Réservé au stockage privé futur. Aucun fichier n'est accepté dans cette étape.
+model PatientDocument {
+  id         String   @id @default(cuid())
+  patientId  String
+  patient    Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  fileName   String
+  mimeType   String
+  byteSize   Int
+  storageKey String
+  createdAt  DateTime @default(now())
+
+  @@index([patientId])
+}
+
+/// Note déclarée par le patient, distincte des pièces et des demandes.
+model RecordNote {
+  id        String    @id @default(cuid())
+  patientId String
+  patient   Patient   @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  kind      String
+  body      String
+  notedOn   DateTime? @db.Date
+  createdAt DateTime  @default(now())
+
+  @@index([patientId, kind])
+}

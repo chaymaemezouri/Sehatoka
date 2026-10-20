@@ -1,7 +1,7 @@
 import { ArrowLeft, CalendarClock, ClipboardList, RotateCcw, Siren } from "lucide-react"
 import type { ReactNode } from "react"
 import { ChatPanel } from "@/components/chatbot/ChatPanel.tsx"
-import { directoryDoctors } from "@/data/demo-directory.ts"
+import { CareChoices } from "@/components/care/CareChoices.tsx"
 import { useChat } from "@/hooks/useChat.ts"
 import { cn } from "@/lib/utils.ts"
 
@@ -17,10 +17,6 @@ export function AssistantPage() {
   const recommendation = [...chat.messages]
     .reverse()
     .find((message) => message.recommendation)?.recommendation
-  const doctors =
-    recommendation?.specialtyId && recommendation.urgency !== "urgent"
-      ? directoryDoctors.filter((doctor) => doctor.specialtyId === recommendation.specialtyId)
-      : []
 
   return (
     <div className="relative flex h-svh flex-col overflow-hidden">
@@ -76,40 +72,9 @@ export function AssistantPage() {
           <p className="text-[14px] leading-relaxed text-ink-soft">
             {recommendation
               ? recommendation.rationale
-              : "Décrivez ce qui vous amène. Les médecins de la spécialité correspondante apparaissent ici."}
+              : "Les médecins avec le plus d'avis restent proposés. Une spécialité ou une ville affine la liste."}
           </p>
-
-          {doctors.length > 0 ? (
-            <div>
-              <p className="text-[12px] text-ink-faint">Médecins</p>
-              <ul className="mt-2 space-y-2">
-                {doctors.map((doctor) => (
-                  <li key={doctor.id}>
-                    <a
-                      href={`#patient/medecins/${doctor.id}`}
-                      className="block rounded-2xl border border-white/80 bg-white/70 px-3 py-2.5 shadow-[inset_0_1px_0_rgb(255_255_255)] transition-colors hover:bg-white"
-                    >
-                      <span className="block text-[13px] font-medium text-ink">
-                        {doctor.firstName} {doctor.lastName}
-                      </span>
-                      <span className="mt-0.5 block text-[12px] text-ink-faint">
-                        {doctor.city} · {doctor.establishment}
-                      </span>
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ) : null}
-
-          {recommendation?.specialtyId && recommendation.urgency !== "urgent" ? (
-            <a
-              href={`#patient/medecins?specialite=${recommendation.specialtyId}`}
-              className="mt-auto inline-flex items-center justify-center rounded-full bg-ink px-4 py-2.5 text-[13px] font-medium text-white"
-            >
-              Trouver un médecin
-            </a>
-          ) : null}
+          <CareChoices messages={chat.messages} recommendation={recommendation} />
         </aside>
       </div>
     </div>

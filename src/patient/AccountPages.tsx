@@ -72,7 +72,7 @@ export function ProfilePage() {
           {en ? "Conditions" : "Antécédents"}
           <textarea name="conditions" defaultValue={account.conditions} rows={3} className="mt-1.5 w-full rounded-2xl border border-black/10 bg-white px-3 py-2 text-[14px] outline-none" />
         </label>
-        <button type="submit" className="h-11 rounded-full bg-[#161616] px-5 text-[14px] font-medium text-white sm:col-span-2">{en ? "Save" : "Enregistrer"}</button>
+        <button type="submit" className="h-11 rounded-full bg-[#9a4e66] px-5 text-[14px] font-medium text-white sm:col-span-2">{en ? "Save" : "Enregistrer"}</button>
       </Panel>
     </form>
   )
@@ -147,7 +147,7 @@ export function PrivacyPage() {
         <form onSubmit={(event) => void onPassword(event)} className="mt-3 grid gap-3">
           <Field name="current" label={en ? "Current password" : "Mot de passe actuel"} type="password" />
           <Field name="next" label={en ? "New password" : "Nouveau mot de passe"} type="password" />
-          <button type="submit" className="h-10 rounded-full bg-[#161616] px-4 text-[13px] font-medium text-white">{en ? "Update" : "Mettre à jour"}</button>
+          <button type="submit" className="h-10 rounded-full bg-[#9a4e66] px-4 text-[13px] font-medium text-white">{en ? "Update" : "Mettre à jour"}</button>
         </form>
       </Panel>
       <Panel className="space-y-3">
@@ -200,7 +200,7 @@ export function SettingsPage() {
         <h2 className="text-[15px] font-medium">{en ? "Language" : "Langue"}</h2>
         <div className="flex gap-2">
           {(["fr", "en"] as const).map((item) => (
-            <button key={item} type="button" onClick={() => { setLocale(item); void updateProfile({ language: item }) }} className={`h-9 rounded-full px-4 text-[13px] uppercase ${locale === item ? "bg-navy text-white" : "border border-black/10"}`} aria-pressed={locale === item}>
+            <button key={item} type="button" onClick={() => { setLocale(item); void updateProfile({ language: item }) }} className={`h-9 rounded-full px-4 text-[13px] uppercase ${locale === item ? "bg-[#f6dde4] text-[#7a3a50]" : "border border-white/80 bg-white/50"}`} aria-pressed={locale === item}>
               {item}
             </button>
           ))}

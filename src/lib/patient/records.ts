@@ -136,6 +136,31 @@ export function recordsFor(patientId: string) {
   }
 }
 
+export async function saveHeldNote(patientId: string, name: string, text: string) {
+  if (documents.some((item) => item.patientId === patientId && item.name === name)) {
+    return
+  }
+  const id = createId("doc")
+  const blob = new Blob([text], { type: "text/plain" })
+  try {
+    await putBlob(id, blob)
+  } catch {
+    return
+  }
+  documents = [
+    {
+      id,
+      patientId,
+      name,
+      size: blob.size,
+      mime: "text/plain",
+      addedAt: "2026-03-02T09:00:00.000Z",
+    },
+    ...documents,
+  ]
+  saveAll()
+}
+
 export async function addDocument(patientId: string, file: File) {
   if (file.size > maxBytes) {
     return "large" as const

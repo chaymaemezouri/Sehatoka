@@ -1,5 +1,5 @@
 import { ChatPanel } from "@/components/chatbot/ChatPanel.tsx"
-import { directoryDoctors } from "@/data/demo-directory.ts"
+import { CareChoices } from "@/components/care/CareChoices.tsx"
 import { useChat } from "@/hooks/useChat.ts"
 import { useLocale } from "@/i18n/useLocale.ts"
 import { Panel } from "@/patient/ui.tsx"
@@ -9,11 +9,6 @@ export function AssistantPatient() {
   const chat = useChat()
   const en = locale === "en"
   const recommendation = [...chat.messages].reverse().find((message) => message.recommendation && !message.isExample)?.recommendation
-  const urgent = recommendation?.urgency === "urgent"
-  const doctors =
-    recommendation?.specialtyId && !urgent
-      ? directoryDoctors.filter((doctor) => doctor.specialtyId === recommendation.specialtyId)
-      : []
 
   return (
     <div className="space-y-4">
@@ -22,8 +17,8 @@ export function AssistantPatient() {
           <h1 className="text-[1.7rem] font-medium tracking-[-0.04em]">Sehatoka AI</h1>
           <p className="mt-2 max-w-2xl text-[14px] leading-relaxed text-ink-soft">
             {en
-              ? "Orientation only. The assistant does not diagnose, prescribe, or book a slot. The conversation stays in this page and is not sent to an external service."
-              : "Orientation seulement. L'assistant ne diagnostique pas, ne prescrit pas et ne réserve pas de créneau. La conversation reste sur cette page et n'est pas envoyée à un service externe."}
+              ? "Describe what brings you. The choices narrow to a specialty, a city, or urgent care."
+              : "Décrivez ce qui vous amène. Les choix se précisent selon la spécialité, la ville ou l'urgence."}
           </p>
         </div>
         <button type="button" onClick={chat.reset} className="h-9 rounded-full border border-black/10 px-3 text-[13px] font-medium">
@@ -40,32 +35,15 @@ export function AssistantPatient() {
             {recommendation?.specialtyName ?? (en ? "Waiting for a need" : "En attente d'un besoin")}
           </h2>
           <p className="text-[13px] leading-relaxed text-ink-soft">
-            {recommendation?.rationale ?? (en ? "Describe what is happening. A specialty can appear here." : "Décrivez ce qui se passe. Une spécialité peut apparaître ici.")}
+            {recommendation?.rationale ??
+              (en
+                ? "Doctors with the most reviews stay listed. A specialty or a city narrows them."
+                : "Les médecins avec le plus d'avis restent proposés. Une spécialité ou une ville affine la liste.")}
           </p>
-          {doctors.length > 0 ? (
-            <ul className="space-y-2">
-              {doctors.map((doctor) => (
-                <li key={doctor.id}>
-                  <a href={`#patient/medecins/${doctor.id}`} className="block rounded-2xl border border-black/8 bg-canvas px-3 py-2.5">
-                    <span className="block text-[13px] font-medium text-ink">
-                      {doctor.firstName} {doctor.lastName}
-                    </span>
-                    <span className="mt-0.5 block text-[12px] text-ink-faint">
-                      {doctor.city} · {doctor.establishment}
-                    </span>
-                  </a>
-                </li>
-              ))}
-            </ul>
-          ) : null}
-          {recommendation?.specialtyId && !urgent ? (
-            <a href={`#patient/medecins?specialite=${recommendation.specialtyId}`} className="inline-flex h-10 items-center rounded-full bg-[#161616] px-4 text-[13px] font-medium text-white">
-              {en ? "Find a doctor" : "Trouver un médecin"}
-            </a>
-          ) : null}
-          {urgent ? (
+          <CareChoices messages={chat.messages.filter((message) => !message.isExample)} recommendation={recommendation} />
+          {recommendation?.urgency === "urgent" ? (
             <p className="text-[13px] leading-relaxed text-danger">
-              {en ? "This may need urgent care. Do not continue toward an appointment." : "Cela peut relever des soins urgents. Ne poursuivez pas vers un rendez-vous."}
+              {en ? "These clinics stay among the choices for urgent signs." : "Ces cliniques restent dans les choix en cas de signes urgents."}
             </p>
           ) : null}
           <p className="text-[12px] leading-relaxed text-ink-faint">{t.chat.disclaimer}</p>

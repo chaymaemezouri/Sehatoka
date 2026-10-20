@@ -37,7 +37,7 @@ function RequestList() {
               : "Ce sont des préférences de session. Aucun rendez-vous n'est confirmé, et aucun agenda n'est bloqué."}
           </p>
         </div>
-        <a href="#patient/rendez-vous/nouveau" className="inline-flex h-10 items-center rounded-full bg-[#161616] px-4 text-[13px] font-medium text-white">
+        <a href="#patient/rendez-vous/nouveau" className="inline-flex h-10 items-center rounded-full bg-[#9a4e66] px-4 text-[13px] font-medium text-white">
           {en ? "Note a request" : "Noter une demande"}
         </a>
       </header>
@@ -132,7 +132,7 @@ function Booking({ params }: { params: URLSearchParams }) {
             ? "Your preference is saved. No professional is notified, and no slot is held."
             : "Votre préférence est enregistrée. Aucun professionnel n'est prévenu, et aucun créneau n'est retenu."}
         </p>
-        <a href={`#patient/rendez-vous/${created}`} className="mt-5 inline-flex h-11 items-center rounded-full bg-[#161616] px-5 text-[14px] font-medium text-white">
+        <a href={`#patient/rendez-vous/${created}`} className="mt-5 inline-flex h-11 items-center rounded-full bg-[#9a4e66] px-5 text-[14px] font-medium text-white">
           {en ? "View the request" : "Voir la demande"}
         </a>
       </Panel>
@@ -166,7 +166,7 @@ function Booking({ params }: { params: URLSearchParams }) {
           <legend className="text-[12px] text-ink-soft">{en ? "Mode" : "Modalité"}</legend>
           <div className="mt-2 flex gap-2">
             {(["cabinet", "visio"] as const).map((item) => (
-              <button key={item} type="button" onClick={() => setMode(item)} className={`h-10 rounded-full px-4 text-[13px] ${mode === item ? "bg-navy text-white" : "border border-black/10"}`} aria-pressed={mode === item}>
+              <button key={item} type="button" onClick={() => setMode(item)} className={`h-10 rounded-full px-4 text-[13px] ${mode === item ? "bg-[#f6dde4] text-[#7a3a50]" : "border border-white/80 bg-white/50"}`} aria-pressed={mode === item}>
                 {item === "cabinet" ? (en ? "Office" : "Cabinet") : "Visio"}
               </button>
             ))}
@@ -176,7 +176,7 @@ function Booking({ params }: { params: URLSearchParams }) {
           <legend className="text-[12px] text-ink-soft">{en ? "Preference" : "Préférence"}</legend>
           <div className="mt-2 flex flex-wrap gap-2">
             {(["matin", "apres-midi", "semaine"] as const).map((item) => (
-              <button key={item} type="button" onClick={() => setWindowChoice(item)} className={`h-10 rounded-full px-4 text-[13px] ${windowChoice === item ? "bg-navy text-white" : "border border-black/10"}`} aria-pressed={windowChoice === item}>
+              <button key={item} type="button" onClick={() => setWindowChoice(item)} className={`h-10 rounded-full px-4 text-[13px] ${windowChoice === item ? "bg-[#f6dde4] text-[#7a3a50]" : "border border-white/80 bg-white/50"}`} aria-pressed={windowChoice === item}>
                 {windowLabel(item, en)}
               </button>
             ))}
@@ -187,7 +187,7 @@ function Booking({ params }: { params: URLSearchParams }) {
             {doctor.firstName} {doctor.lastName} · {t.specialties[doctor.specialtyId].name} · {doctor.city}
           </p>
         ) : null}
-        <button type="submit" className="inline-flex h-11 items-center rounded-full bg-[#161616] px-5 text-[14px] font-medium text-white">
+        <button type="submit" className="inline-flex h-11 items-center rounded-full bg-[#9a4e66] px-5 text-[14px] font-medium text-white">
           {en ? "Save this preference" : "Enregistrer cette préférence"}
         </button>
       </Panel>
@@ -243,7 +243,7 @@ function RequestDetail({ id }: { id: string }) {
             </select>
           </label>
           <div className="flex flex-wrap gap-2">
-            <button type="button" onClick={save} className="h-10 rounded-full bg-[#161616] px-4 text-[13px] font-medium text-white">{en ? "Update preference" : "Modifier la préférence"}</button>
+            <button type="button" onClick={save} className="h-10 rounded-full bg-[#9a4e66] px-4 text-[13px] font-medium text-white">{en ? "Update preference" : "Modifier la préférence"}</button>
             <button type="button" onClick={cancel} className="h-10 rounded-full border border-black/10 px-4 text-[13px] font-medium">{en ? "Cancel request" : "Annuler la demande"}</button>
           </div>
         </div>

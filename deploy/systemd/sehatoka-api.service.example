@@ -1,0 +1,22 @@
+# Exemple à installer plus tard, uniquement pour Sehatoka.
+# Ne pas l'activer tant que la base, le port et les autres services du VPS n'ont pas été vérifiés.
+# Ce fichier n'est pas installé par le projet.
+
+[Unit]
+Description=Sehatoka account service
+After=network.target postgresql.service
+
+[Service]
+Type=simple
+User=sehatoka
+Group=sehatoka
+WorkingDirectory=/opt/sehatoka/server
+EnvironmentFile=/opt/sehatoka/server/.env
+ExecStart=/usr/bin/node dist/main.js
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
